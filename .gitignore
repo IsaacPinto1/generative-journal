@@ -1,2 +1,5 @@
 api_key.txt
 /client/node_modules
+
+/server/.env
+/server/node_modules
