@@ -19,7 +19,7 @@ function App(){
 
                 <Route path = '/home' element = {<Home/>}>
                 </Route>
-                <Route path = "*" element={cookies.user? <Navigate to = "/home/welcome"/>: <Navigate to = "/login"/> }></Route>
+                <Route path = "*" element={cookies.user? <Navigate to = "/home"/>: <Navigate to = "/login"/> }></Route>
             </Routes>
         </BrowserRouter>
     )

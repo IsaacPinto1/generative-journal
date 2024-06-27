@@ -68,7 +68,6 @@ app.get('/getUserData', async (req, res) => {
       const _id = req.query; // Modify the query parameter to "_id"
       const query = _id ? { _id } : {};
 
-      console.log(query)
       
       const user = await UserModel.findOne(query);
       res.json(user);
@@ -232,3 +231,20 @@ app.post('/api/journal', async (req, res) => {
   }
 });
 
+
+app.get('/api/journal', async (req, res) => {
+  try {
+    const { userID, date } = req.query;
+
+    const userJournal = await UserJournal.findOne({ userID });
+    if (!userJournal || !userJournal.entries.has(date)) {
+      return res.json({ entry: '', summary: '' });
+    }
+
+    const journalEntry = userJournal.entries.get(date);
+    res.json(journalEntry);
+  } catch (error) {
+    console.error('Error fetching journal entry:', error);
+    res.status(500).send('Error fetching journal entry');
+  }
+});

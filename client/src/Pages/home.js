@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from 'react';
 import axios from 'axios';
 import { CookiesProvider, useCookies } from "react-cookie";
+import './home.css'
 
 function Home(){
 
@@ -12,7 +13,7 @@ function Home(){
     const navigate = useNavigate()
     const [name, setName] = useState('');
     const [entry, setEntry] = useState('');
-    const [response, setResponse] = useState(null);
+    const [response, setResponse] = useState('Please make an entry.');
     const [date, setDate] = useState(''); // New state for date
 
     function logOut(){
@@ -24,9 +25,35 @@ function Home(){
         setEntry(e.target.value);
     };
 
-    const handleDateChange = (e) => {
-        setDate(e.target.value); // New function to handle date change
-      };
+    const handleDateChange = async (e) => {
+      const selectedDate = e.target.value;
+      setDate(selectedDate);
+      const userID = name;
+    
+      if (!userID) {
+        setResponse('No user ID found in cookies');
+        return;
+      }
+    
+      try {
+        const res = await axios.get('http://localhost:3001/api/journal', {
+          params: { userID, date: selectedDate }
+        });
+    
+        const { entry, summary } = res.data;
+        setEntry(entry);
+        if(summary == ""){
+          setResponse("Please make an entry.")
+        } else{
+          setResponse(summary);
+        }
+      } catch (error) {
+        console.error('Error fetching journal entry:', error);
+        setResponse('Error fetching journal entry');
+      }
+    };
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -44,8 +71,8 @@ function Home(){
             date,
             entry
           });
-    
-          setResponse(res.data);
+          console.log(res)
+          //setResponse(res.data);
         } catch (error) {
           console.error('Error saving journal entry:', error);
           setResponse('Error saving journal entry');
@@ -85,9 +112,10 @@ function Home(){
         </div>
         :
         <>
-            <h2>Hello, {name}!</h2>
-            <p>Welcome to the journal</p>
-            <h1>Journal Entry</h1>
+            <div id = 'header-container'>
+              <h1>{name}'s Journal</h1>
+              <button onClick={logOut} className='logout-button'>Log Out</button>
+            </div>
             <form onSubmit={handleSubmit}>
                 <input
                     type="date"
@@ -95,15 +123,18 @@ function Home(){
                     onChange={handleDateChange} // New date input field
                     required
                 />
+                <br></br>
                 <textarea
                 value={entry}
                 onChange={handleChange}
                 placeholder="Write your journal entry here..."
                 />
+                <br></br>
                 <button type="submit">Submit</button>
             </form>
-            {response && <p>{JSON.stringify(response)}</p>}
-            <button onClick={logOut} className='logout-button'>Log Out</button>
+            {date == "" ? <p>Please select a date.</p> : response == "" ? <p>Please make an entry.</p> : response}
+            {/*response && <p>{JSON.stringify(response)}</p>*/}
+            <br></br>
         </>
         }
         </>
