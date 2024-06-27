@@ -19,7 +19,6 @@ function Home(){
           navigate("/login");
           return;
         }
-        navigate("/home/welcome")
       }, [cookies]);
 
 

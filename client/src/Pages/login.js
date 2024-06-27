@@ -34,7 +34,7 @@ function Login({setCookie2}) {
         if(result.data.status === "Success"){
           setCookie("user", result.data.id, { path: "/" })
           if(result.data.name !== ''){
-            navigate("/home/welcome")
+            navigate("/home")
           }
         } else if(result.data.status === "Wrong Password"){
             setErr("wrongp")
