@@ -1,5 +1,8 @@
 api_key.txt
+notes.txt
+
 /client/node_modules
 
 /server/.env
 /server/node_modules
+
