@@ -13,6 +13,7 @@ function Home(){
     const [name, setName] = useState('');
     const [entry, setEntry] = useState('');
     const [response, setResponse] = useState(null);
+    const [date, setDate] = useState(''); // New state for date
 
     function logOut(){
         removeCookie("user", { path: '/'});
@@ -23,11 +24,20 @@ function Home(){
         setEntry(e.target.value);
     };
 
+    const handleDateChange = (e) => {
+        setDate(e.target.value); // New function to handle date change
+      };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
     
         const userID = name;
-        const date = new Date().toLocaleDateString(); // Format: MM/DD/YYYY
+
+        if (!date) { // Check if date is selected
+            setResponse('Please select a date');
+            return;
+        }
+
         try {
           const res = await axios.post('http://localhost:3001/api/journal', {
             userID,
@@ -79,6 +89,12 @@ function Home(){
             <p>Welcome to the journal</p>
             <h1>Journal Entry</h1>
             <form onSubmit={handleSubmit}>
+                <input
+                    type="date"
+                    value={date}
+                    onChange={handleDateChange} // New date input field
+                    required
+                />
                 <textarea
                 value={entry}
                 onChange={handleChange}
