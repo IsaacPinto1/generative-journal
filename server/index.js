@@ -1,11 +1,12 @@
 const express = require("express")
 const mongoose = require("mongoose")
-const ApiKey = require('./models/ApiKey')
 const dotenv = require('dotenv');
 const axios = require('axios');
 const cors = require("cors")
 const connectDB = require('./config/db');
 const UserModel = require('./models/user')
+const ApiKey = require('./models/ApiKey')
+const UserJournal = require('./models/UserJournal'); // Adjust the path as necessary
 
 dotenv.config();
 connectDB();
@@ -66,6 +67,8 @@ app.get('/getUserData', async (req, res) => {
   try {
       const _id = req.query; // Modify the query parameter to "_id"
       const query = _id ? { _id } : {};
+
+      console.log(query)
       
       const user = await UserModel.findOne(query);
       res.json(user);
@@ -166,3 +169,66 @@ app.get('/api/completion', async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Journal:
+
+// Endpoint to add a journal entry
+app.post('/api/journal', async (req, res) => {
+  try {
+    const { userID, date, entry } = req.body;
+
+    // Check if the user exists
+    const user = await UserModel.findOne({name:userID});
+    if (!user) {
+      return res.json({
+        status: "No User Exists",
+        user: null
+      });
+    }
+
+    // Find or create the user journal entry
+    let userJournal = await UserJournal.findOne({ userID });
+    if (!userJournal) {
+      userJournal = new UserJournal({ userID });
+    }
+
+    // Set the journal entry
+    userJournal.entries.set(date, { date, entry, summary: "This is the OpenAI response" });
+
+    // Save the journal entry
+    await userJournal.save();
+
+    // Respond with success
+    res.json({ status: 'Success', user: userJournal });
+  } catch (error) {
+    console.error('Error saving journal entry:', error);
+    res.status(500).send('Error saving journal entry');
+  }
+});
+
