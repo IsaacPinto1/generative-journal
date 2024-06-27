@@ -27,22 +27,26 @@ function Home(){
 
     const summarizeJournalEntry = async (entryText) => {
       try {
+        const openaiRes = await axios.post('http://localhost:3001/api/completion', {
+            prompt: `Read the following journal entry and provide a brief wellness tip: ${entryText}`
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          }
+        );
+
+        const extractedSummary = openaiRes.data.completion;
+
         const res = await axios.post('http://localhost:3001/api/journal', {
           userID: name,
           date,
-          entry: entryText
+          entry: entryText,
+          summary: extractedSummary
         });
     
         // Now call OpenAI API to summarize the entry
-        const openaiRes = await axios.post('http://localhost:3001/api/completion', {
-          prompt: `Read the following journal entry and provide a brief wellness tip: ${entryText}`
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        }
-      );
     
         // Update the state with the OpenAI response
         setResponse(openaiRes.data.completion);

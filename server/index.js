@@ -198,7 +198,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Endpoint to add a journal entry
 app.post('/api/journal', async (req, res) => {
   try {
-    const { userID, date, entry } = req.body;
+    const { userID, date, entry, summary } = req.body;
 
     // Check if the user exists
     const user = await UserModel.findOne({name:userID});
@@ -216,7 +216,7 @@ app.post('/api/journal', async (req, res) => {
     }
 
     // Set the journal entry
-    userJournal.entries.set(date, { date, entry, summary: "This is the OpenAI response" });
+    userJournal.entries.set(date, { date, entry, summary});
 
     // Save the journal entry
     await userJournal.save();
