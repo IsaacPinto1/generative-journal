@@ -130,14 +130,12 @@ app.post('/registerkey', (req, res) =>{ // request, response
 })
 
 
-app.get('/api/completion', async (req, res) => {
+app.post('/api/completion', async (req, res) => {
     try {
       const apiKeyDoc = await ApiKey.findOne({ service: 'OpenAI' });
       if (!apiKeyDoc) {
         return res.status(404).json({ msg: 'API key not found' });
       }
-      console.log('API Key:', apiKeyDoc.apiKey);
-      console.log('Prompt:', req.body.prompt);
   
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',

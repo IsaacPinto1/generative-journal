@@ -25,15 +25,38 @@ function Home(){
         setEntry(e.target.value);
     };
 
+    const summarizeJournalEntry = async (entryText) => {
+      try {
+        const res = await axios.post('http://localhost:3001/api/journal', {
+          userID: name,
+          date,
+          entry: entryText
+        });
+    
+        // Now call OpenAI API to summarize the entry
+        const openaiRes = await axios.post('http://localhost:3001/api/completion', {
+          prompt: `Read the following journal entry and provide a brief wellness tip: ${entryText}`
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+    
+        // Update the state with the OpenAI response
+        setResponse(openaiRes.data.completion);
+      } catch (error) {
+        console.error('Error saving or summarizing journal entry:', error);
+        setResponse('Error saving or summarizing journal entry');
+      }
+    };
+
     const handleDateChange = async (e) => {
       const selectedDate = e.target.value;
       setDate(selectedDate);
       const userID = name;
     
-      if (!userID) {
-        setResponse('No user ID found in cookies');
-        return;
-      }
     
       try {
         const res = await axios.get('http://localhost:3001/api/journal', {
@@ -54,30 +77,25 @@ function Home(){
     };
 
 
-
     const handleSubmit = async (e) => {
-        e.preventDefault();
+      e.preventDefault();
     
-        const userID = name;
+      if (!date) {
+        setResponse('Please select a date');
+        return;
+      }
+    
+      try {
+        await summarizeJournalEntry(entry); // Call the summarize function
+    
+        // Optionally, clear the entry field after submission
+        //setEntry('');
+      } catch (error) {
+        console.error('Error saving or summarizing journal entry:', error);
+        setResponse('Error saving or summarizing journal entry');
+      }
+    };
 
-        if (!date) { // Check if date is selected
-            setResponse('Please select a date');
-            return;
-        }
-
-        try {
-          const res = await axios.post('http://localhost:3001/api/journal', {
-            userID,
-            date,
-            entry
-          });
-          console.log(res)
-          //setResponse(res.data);
-        } catch (error) {
-          console.error('Error saving journal entry:', error);
-          setResponse('Error saving journal entry');
-        }
-      };
 
     useEffect(() => {
         const handleFetchData = async () => {
