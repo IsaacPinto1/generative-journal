@@ -27,3 +27,7 @@
         transform: scale(1.05); /* Grow slightly on hover */
     }
   }
+
+#response-container{
+  width: 400px;
+}

@@ -28,7 +28,8 @@ function Home(){
     const summarizeJournalEntry = async (entryText) => {
       try {
         const openaiRes = await axios.post('http://localhost:3001/api/completion', {
-            prompt: `Read the following journal entry and provide a brief wellness tip: ${entryText}`
+            prompt: `Read the following journal entry and provide a brief wellness tip. Start your
+            reponse with 'Wellness Tip:'` + `\n${entryText}`
           },
           {
             headers: {
@@ -154,7 +155,9 @@ function Home(){
                 <br></br>
                 <button type="submit">Submit</button>
             </form>
+            <div id = 'response-container'>
             {date == "" ? <p>Please select a date.</p> : response == "" ? <p>Please make an entry.</p> : response}
+            </div>
             {/*response && <p>{JSON.stringify(response)}</p>*/}
             <br></br>
         </>
